@@ -1,0 +1,6 @@
+apiVersion: v2
+name: livebox-exporter
+description: A prometheus exporter for Livebox
+type: application
+version: 0.1.0
+appVersion: "v0.1.0"

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "livebox-exporter.fullname" . }}
+  labels:
+    {{- include "livebox-exporter.labels" . | nindent 4 }}
+  annotations:
+    prometheus.io/scrape: "true"
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "livebox-exporter.selectorLabels" . | nindent 4 }}
