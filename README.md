@@ -7,10 +7,10 @@ FTTH subscription.
 
 This exporter currently exposes the following metrics:
 
-| Name               | Type  | Description                  | Labels    |
-| ------------------ | ----- | ---------------------------- | --------- |
-| interface_rx_mbits | gauge | Received Mbits per second    | interface |
-| interface_tx_mbits | gauge | Transmitted Mbits per second | interface |
+| Name                       | Type  | Description                  | Labels    |
+| -------------------------- | ----- | ---------------------------- | --------- |
+| livebox_interface_rx_mbits | gauge | Received Mbits per second    | interface |
+| livebox_interface_tx_mbits | gauge | Transmitted Mbits per second | interface |
 
 ## Usage
 

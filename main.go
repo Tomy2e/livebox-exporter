@@ -19,15 +19,15 @@ const defaultPollingFrequency = 30
 
 var (
 	rxMbits = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "interface_rx_mbits",
-		Help: "Received Mbits per second",
+		Name: "livebox_interface_rx_mbits",
+		Help: "Received Mbits per second.",
 	}, []string{
 		// Name of the interface.
 		"interface",
 	})
 	txMbits = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "interface_tx_mbits",
-		Help: "Transmitted Mbits per second",
+		Name: "livebox_interface_tx_mbits",
+		Help: "Transmitted Mbits per second.",
 	}, []string{
 		// Name of the interface.
 		"interface",
