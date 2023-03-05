@@ -16,7 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-const defaultPollingFrequency = 30
+const defaultPollingFrequency = 5
 
 func main() {
 	pollingFrequency := flag.Uint("polling-frequency", defaultPollingFrequency, "Polling frequency")
