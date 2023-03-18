@@ -16,8 +16,8 @@ This exporter currently exposes the following metrics:
 | livebox_interface_homelan_tx_mbits | gauge | Transmitted Mbits per second                      | interface | Yes          |
 | livebox_interface_netdev_rx_mbits  | gauge | Received Mbits per second                         | interface | Yes          |
 | livebox_interface_netdev_tx_mbits  | gauge | Transmitted Mbits per second                      | interface | Yes          |
-| livebox_wan_rx_mbits               | gauge | Received Mbits per second on the WAN interface    | interface | Yes          |
-| livebox_wan_tx_mbits               | gauge | Transmitted Mbits per second on the WAN interface | interface | Yes          |
+| livebox_wan_rx_mbits               | gauge | Received Mbits per second on the WAN interface    |           | Yes          |
+| livebox_wan_tx_mbits               | gauge | Transmitted Mbits per second on the WAN interface |           | Yes          |
 
 Experimental metrics are not enabled by default, use the `-experimental`
 command-line option to enable them.
