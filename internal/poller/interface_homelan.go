@@ -87,7 +87,7 @@ func (im *InterfaceHomeLanMbits) Poll(ctx context.Context) error {
 			Rx: stats.Status.BytesReceived,
 		}
 
-		if itf.IsWAN() {
+		if !itf.IsWAN() {
 			counters.Swap()
 		}
 

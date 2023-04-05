@@ -76,7 +76,7 @@ func (im *InterfaceNetDevMbits) Poll(ctx context.Context) error {
 			Rx: stats.Status.RxBytes,
 		}
 
-		if itf.IsWAN() {
+		if !itf.IsWAN() {
 			counters.Swap()
 		}
 
