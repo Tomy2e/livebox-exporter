@@ -7,11 +7,20 @@ FTTH subscription.
 
 This exporter currently exposes the following metrics:
 
-| Name                       | Type  | Description                        | Labels    |
-| -------------------------- | ----- | ---------------------------------- | --------- |
-| livebox_interface_rx_mbits | gauge | Received Mbits per second          | interface |
-| livebox_interface_tx_mbits | gauge | Transmitted Mbits per second       | interface |
-| livebox_devices_total      | gauge | The total number of active devices | type      |
+| Name                               | Type  | Description                                       | Labels    | Experimental |
+| ---------------------------------- | ----- | ------------------------------------------------- | --------- | ------------ |
+| livebox_interface_rx_mbits         | gauge | Received Mbits per second                         | interface | No           |
+| livebox_interface_tx_mbits         | gauge | Transmitted Mbits per second                      | interface | No           |
+| livebox_devices_total              | gauge | The total number of active devices                | type      | No           |
+| livebox_interface_homelan_rx_mbits | gauge | Received Mbits per second                         | interface | Yes          |
+| livebox_interface_homelan_tx_mbits | gauge | Transmitted Mbits per second                      | interface | Yes          |
+| livebox_interface_netdev_rx_mbits  | gauge | Received Mbits per second                         | interface | Yes          |
+| livebox_interface_netdev_tx_mbits  | gauge | Transmitted Mbits per second                      | interface | Yes          |
+| livebox_wan_rx_mbits               | gauge | Received Mbits per second on the WAN interface    |           | Yes          |
+| livebox_wan_tx_mbits               | gauge | Transmitted Mbits per second on the WAN interface |           | Yes          |
+
+Experimental metrics are not enabled by default, use the `-experimental`
+command-line option to enable them.
 
 ## Usage
 
@@ -19,10 +28,11 @@ This exporter currently exposes the following metrics:
 
 The exporter accepts the following command-line options:
 
-| Name                | Description       | Default value |
-| ------------------- | ----------------- | ------------- |
-| --polling-frequency | Polling frequency | 30            |
-| --listen            | Listening address | :8080         |
+| Name               | Description                                                                                                                                | Default value |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
+| -polling-frequency | Polling frequency                                                                                                                          | 30            |
+| -listen            | Listening address                                                                                                                          | :8080         |
+| -experimental      | Comma separated list of experimental metrics to enable (available metrics: livebox_interface_homelan,livebox_interface_netdev,livebox_wan) |               |
 
 The exporter reads the following environment variables:
 

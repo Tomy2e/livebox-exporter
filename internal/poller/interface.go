@@ -6,6 +6,7 @@ import (
 
 	"github.com/Tomy2e/livebox-api-client"
 	"github.com/Tomy2e/livebox-api-client/api/request"
+	"github.com/Tomy2e/livebox-exporter/pkg/bitrate"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -42,10 +43,6 @@ func NewInterfaceMbits(client livebox.Client) *InterfaceMbits {
 // Collectors returns all metrics.
 func (im *InterfaceMbits) Collectors() []prometheus.Collector {
 	return []prometheus.Collector{im.txMbits, im.rxMbits}
-}
-
-func bitsPer30SecsToMbitsPerSec(v int) float64 {
-	return float64(v) / 30000000
 }
 
 // Poll polls the current bandwidth usage.
@@ -87,10 +84,10 @@ func (im *InterfaceMbits) Poll(ctx context.Context) error {
 
 		im.rxMbits.
 			With(prometheus.Labels{"interface": iface}).
-			Set(bitsPer30SecsToMbitsPerSec(rxCounter))
+			Set(bitrate.BitsPer30SecsToMbits(rxCounter))
 		im.txMbits.
 			With(prometheus.Labels{"interface": iface}).
-			Set(bitsPer30SecsToMbitsPerSec(txCounter))
+			Set(bitrate.BitsPer30SecsToMbits(txCounter))
 	}
 
 	return nil
