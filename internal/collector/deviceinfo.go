@@ -36,12 +36,12 @@ func NewDeviceInfo(client livebox.Client) *DeviceInfo {
 			nil, nil,
 		),
 		memoryTotalMetric: prometheus.NewDesc(
-			"livebox_deviceinfo_memory_total_mbytes",
+			"livebox_deviceinfo_memory_total_bytes",
 			"Livebox system total memory.",
 			nil, nil,
 		),
 		memoryUsageMetric: prometheus.NewDesc(
-			"livebox_deviceinfo_memory_usage_mbytes",
+			"livebox_deviceinfo_memory_usage_bytes",
 			"Livebox system used memory.",
 			nil, nil,
 		),
@@ -79,8 +79,8 @@ func (d *DeviceInfo) memoryStatus(c chan<- prometheus.Metric) {
 		return
 	}
 
-	c <- prometheus.MustNewConstMetric(d.memoryTotalMetric, prometheus.GaugeValue, memoryStatus.Status.Total)
-	c <- prometheus.MustNewConstMetric(d.memoryUsageMetric, prometheus.GaugeValue, memoryStatus.Status.Total-memoryStatus.Status.Free)
+	c <- prometheus.MustNewConstMetric(d.memoryTotalMetric, prometheus.GaugeValue, 1000*memoryStatus.Status.Total)
+	c <- prometheus.MustNewConstMetric(d.memoryUsageMetric, prometheus.GaugeValue, 1000*(memoryStatus.Status.Total-memoryStatus.Status.Free))
 }
 
 // Collect collects all DeviceInfo metrics.

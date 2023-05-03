@@ -14,8 +14,8 @@ This exporter currently exposes the following metrics:
 | livebox_devices_total                   | gauge | The total number of active devices                | type      | No           |
 | livebox_deviceinfo_reboots_total        | gauge | Number of Livebox reboots                         |           | No           |
 | livebox_deviceinfo_uptime_seconds_total | gauge | Livebox current uptime                            |           | No           |
-| livebox_deviceinfo_memory_total_mbytes  | gauge | Livebox system total memory                       |           | No           |
-| livebox_deviceinfo_memory_usage_mbytes  | gauge | Livebox system used memory                        |           | No           |
+| livebox_deviceinfo_memory_total_bytes   | gauge | Livebox system total memory                       |           | No           |
+| livebox_deviceinfo_memory_usage_bytes   | gauge | Livebox system used memory                        |           | No           |
 | livebox_interface_homelan_rx_mbits      | gauge | Received Mbits per second                         | interface | Yes          |
 | livebox_interface_homelan_tx_mbits      | gauge | Transmitted Mbits per second                      | interface | Yes          |
 | livebox_interface_netdev_rx_mbits       | gauge | Received Mbits per second                         | interface | Yes          |
