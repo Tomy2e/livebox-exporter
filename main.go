@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Tomy2e/livebox-api-client"
+	"github.com/Tomy2e/livebox-exporter/internal/collector"
 	"github.com/Tomy2e/livebox-exporter/internal/poller"
 	exporterLivebox "github.com/Tomy2e/livebox-exporter/pkg/livebox"
 	"github.com/prometheus/client_golang/prometheus"
@@ -129,6 +130,8 @@ func main() {
 			collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		)...,
 	)
+
+	registry.MustRegister(collector.NewDeviceInfo(client))
 
 	go func() {
 		for {
