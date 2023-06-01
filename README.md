@@ -40,9 +40,11 @@ The exporter accepts the following command-line options:
 
 The exporter reads the following environment variables:
 
-| Name           | Description                                                                                               | Default value |
-| -------------- | --------------------------------------------------------------------------------------------------------- | ------------- |
-| ADMIN_PASSWORD | Password of the Livebox "admin" user. The exporter will exit if this environment variable is not defined. |               |
+| Name            | Description                                                                                               | Default value        |
+| --------------- | --------------------------------------------------------------------------------------------------------- | -------------------- |
+| ADMIN_PASSWORD  | Password of the Livebox "admin" user. The exporter will exit if this environment variable is not defined. |                      |
+| LIVEBOX_ADDRESS | Address of the Livebox.                                                                                   | `http://192.168.1.1` |
+| LIVEBOX_CACERT  | Optional path to a PEM-encoded CA certificate file on the local disk.                                     |                      |
 
 ### Docker
 

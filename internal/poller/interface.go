@@ -15,12 +15,12 @@ var _ Poller = &InterfaceMbits{}
 // InterfaceMbits allows to poll the current bandwidth usage on the Livebox
 // interfaces.
 type InterfaceMbits struct {
-	client           livebox.Client
+	client           *livebox.Client
 	txMbits, rxMbits *prometheus.GaugeVec
 }
 
 // NewInterfaceMbits returns a new InterfaceMbits poller.
-func NewInterfaceMbits(client livebox.Client) *InterfaceMbits {
+func NewInterfaceMbits(client *livebox.Client) *InterfaceMbits {
 	return &InterfaceMbits{
 		client: client,
 		txMbits: prometheus.NewGaugeVec(prometheus.GaugeOpts{

@@ -22,14 +22,14 @@ var _ Poller = &InterfaceHomeLanMbits{}
 // InterfaceHomeLanMbits is an experimental poller to get the current bandwidth
 // usage on the Livebox interfaces.
 type InterfaceHomeLanMbits struct {
-	client           livebox.Client
+	client           *livebox.Client
 	interfaces       []*exporterLivebox.Interface
 	bitrate          *bitrate.Bitrate
 	txMbits, rxMbits *prometheus.GaugeVec
 }
 
 // NewInterfaceHomeLanMbits returns a new InterfaceMbits poller.
-func NewInterfaceHomeLanMbits(client livebox.Client, interfaces []*exporterLivebox.Interface) *InterfaceHomeLanMbits {
+func NewInterfaceHomeLanMbits(client *livebox.Client, interfaces []*exporterLivebox.Interface) *InterfaceHomeLanMbits {
 	return &InterfaceHomeLanMbits{
 		client:     client,
 		interfaces: interfaces,

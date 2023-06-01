@@ -3,7 +3,7 @@ module github.com/Tomy2e/livebox-exporter
 go 1.18
 
 require (
-	github.com/Tomy2e/livebox-api-client v0.0.0-20230304114924-a629a6a185e7
+	github.com/Tomy2e/livebox-api-client v0.0.0-20230524112450-31caca47cbd8
 	github.com/prometheus/client_golang v1.14.0
 	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0
 	golang.org/x/sync v0.1.0
