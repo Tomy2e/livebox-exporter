@@ -1,0 +1,10 @@
+{{- if .Values.livebox.caCert }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "livebox-exporter.fullname" . }}
+  labels:
+    {{- include "livebox-exporter.labels" . | nindent 4 }}
+data:
+  ca.crt: {{ toYaml .Values.livebox.caCert | indent 2 }}
+{{- end }}

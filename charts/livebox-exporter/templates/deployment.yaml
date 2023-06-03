@@ -41,13 +41,26 @@ spec:
             - name: ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  {{- if .Values.adminPassword.secretKeyRef }}
-                  name: {{ .Values.adminPassword.secretKeyRef.name}}
-                  key: {{ .Values.adminPassword.secretKeyRef.key }}
+                  {{- if .Values.livebox.adminPassword.secretKeyRef }}
+                  name: {{ .Values.livebox.adminPassword.secretKeyRef.name}}
+                  key: {{ .Values.livebox.adminPassword.secretKeyRef.key }}
                   {{- else }}
                   name: {{ include "livebox-exporter.fullname" . }}-admin
                   key: password
                   {{- end }}
+            {{- with .Values.livebox.address }}
+            - name: LIVEBOX_ADDRESS
+              value: {{ . }}
+            {{- end }}
+            {{- if .Values.livebox.caCert }}
+            - name: LIVEBOX_CACERT
+              value: /etc/livebox/certs/ca.crt
+            {{- end }}
+          {{- if .Values.livebox.caCert }}
+          volumeMounts:
+            - name: livebox-crt
+              mountPath: /etc/livebox/certs
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -59,4 +72,10 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.livebox.caCert }}
+      volumes:
+        - name: livebox-crt
+          configMap:
+            name: {{ include "livebox-exporter.fullname" . }}
       {{- end }}
