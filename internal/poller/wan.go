@@ -14,13 +14,13 @@ var _ Poller = &WANMbits{}
 // WANMbits is an experimental poller to get the current bandwidth usage on the
 // WAN interface of the Livebox.
 type WANMbits struct {
-	client           livebox.Client
+	client           *livebox.Client
 	bitrate          *bitrate.Bitrate
 	txMbits, rxMbits prometheus.Gauge
 }
 
 // NewWANMbits returns a new WANMbits poller.
-func NewWANMbits(client livebox.Client) *WANMbits {
+func NewWANMbits(client *livebox.Client) *WANMbits {
 	return &WANMbits{
 		client:  client,
 		bitrate: bitrate.New(InterfaceHomeLanMbitsMinDelay),

@@ -14,7 +14,7 @@ var _ prometheus.Collector = &DeviceInfo{}
 
 // DeviceInfo implements a prometheus Collector that returns Livebox specific metrics.
 type DeviceInfo struct {
-	client                livebox.Client
+	client                *livebox.Client
 	numberOfRebootsMetric *prometheus.Desc
 	uptimeMetric          *prometheus.Desc
 	memoryTotalMetric     *prometheus.Desc
@@ -22,7 +22,7 @@ type DeviceInfo struct {
 }
 
 // NewDeviceInfo returns a new DeviceInfo collector using the specified client.
-func NewDeviceInfo(client livebox.Client) *DeviceInfo {
+func NewDeviceInfo(client *livebox.Client) *DeviceInfo {
 	return &DeviceInfo{
 		client: client,
 		numberOfRebootsMetric: prometheus.NewDesc(

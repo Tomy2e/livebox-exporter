@@ -27,7 +27,7 @@ func (i *Interface) IsWLAN() bool {
 }
 
 // DiscoverInterfaces discovers network interfaces on the Livebox.
-func DiscoverInterfaces(ctx context.Context, client livebox.Client) ([]*Interface, error) {
+func DiscoverInterfaces(ctx context.Context, client *livebox.Client) ([]*Interface, error) {
 	var mibs struct {
 		Status struct {
 			Base map[string]struct {

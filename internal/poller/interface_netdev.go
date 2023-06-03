@@ -16,14 +16,14 @@ var _ Poller = &InterfaceNetDevMbits{}
 // InterfaceNetDevMbits is an experimental poller to get the current bandwidth
 // usage on the Livebox interfaces.
 type InterfaceNetDevMbits struct {
-	client           livebox.Client
+	client           *livebox.Client
 	interfaces       []*exporterLivebox.Interface
 	bitrate          *bitrate.Bitrate
 	txMbits, rxMbits *prometheus.GaugeVec
 }
 
 // NewInterfaceNetDevMbits returns a new InterfaceNetDevMbits poller.
-func NewInterfaceNetDevMbits(client livebox.Client, interfaces []*exporterLivebox.Interface) *InterfaceNetDevMbits {
+func NewInterfaceNetDevMbits(client *livebox.Client, interfaces []*exporterLivebox.Interface) *InterfaceNetDevMbits {
 	return &InterfaceNetDevMbits{
 		client:     client,
 		interfaces: interfaces,

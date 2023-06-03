@@ -13,12 +13,12 @@ var _ Poller = &DevicesTotal{}
 
 // DevicesTotal allows to poll the total number of active devices.
 type DevicesTotal struct {
-	client       livebox.Client
+	client       *livebox.Client
 	devicesTotal *prometheus.GaugeVec
 }
 
 // NewDevicesTotal returns a new DevicesTotal poller.
-func NewDevicesTotal(client livebox.Client) *DevicesTotal {
+func NewDevicesTotal(client *livebox.Client) *DevicesTotal {
 	return &DevicesTotal{
 		client: client,
 		devicesTotal: prometheus.NewGaugeVec(prometheus.GaugeOpts{

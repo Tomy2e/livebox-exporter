@@ -1,7 +1,3 @@
-# Default values for livebox-exporter.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 replicaCount: 1
 
 image:
@@ -10,12 +6,19 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-adminPassword:
-  secretKeyRef: {}
-  # name: ""
-  # key: ""
+livebox:
+  adminPassword:
+    secretKeyRef: {}
+    # name: ""
+    # key: ""
 
-  value: "changeme"
+    value: "changeme"
+
+  # Address of the Livebox. If empty the exporter will use its own default value.
+  address: ""
+
+  # CA cert of the Livebox.
+  caCert: ""
 
 imagePullSecrets: []
 nameOverride: ""

@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -37,10 +40,14 @@ var experimentalMetrics = []string{
 
 func parseExperimentalFlag(
 	ctx context.Context,
-	client livebox.Client,
+	client *livebox.Client,
 	experimental string,
 	pollingFrequency *uint,
 ) (pollers []poller.Poller) {
+	if experimental == "" {
+		return nil
+	}
+
 	var (
 		interfaces []*exporterLivebox.Interface
 		err        error
@@ -96,6 +103,50 @@ func parseExperimentalFlag(
 	return
 }
 
+func getHTTPClient() (*http.Client, error) {
+	liveboxCACertPath := os.Getenv("LIVEBOX_CACERT")
+
+	if liveboxCACertPath == "" {
+		return http.DefaultClient, nil
+	}
+
+	// Get the SystemCertPool, continue with an empty pool on error.
+	rootCAs, _ := x509.SystemCertPool()
+	if rootCAs == nil {
+		rootCAs = x509.NewCertPool()
+	}
+
+	certs, err := ioutil.ReadFile(liveboxCACertPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read livebox CA cert: %w", err)
+	}
+
+	if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
+		return nil, errors.New("no livebox CA cert was successfully added")
+	}
+
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: rootCAs,
+			},
+		},
+	}, nil
+}
+
+func isFatalError(err error) bool {
+	if errors.Is(err, livebox.ErrInvalidPassword) {
+		return true
+	}
+
+	var certError *tls.CertificateVerificationError
+	if errors.As(err, &certError) {
+		return true
+	}
+
+	return false
+}
+
 func main() {
 	pollingFrequency := flag.Uint("polling-frequency", defaultPollingFrequency, "Polling frequency")
 	listen := flag.String("listen", ":8080", "Listening address")
@@ -110,10 +161,28 @@ func main() {
 		log.Fatal("ADMIN_PASSWORD environment variable must be set")
 	}
 
+	liveboxAddress := os.Getenv("LIVEBOX_ADDRESS")
+	if liveboxAddress == "" {
+		liveboxAddress = livebox.DefaultAddress
+	}
+
+	httpClient, err := getHTTPClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client, err := livebox.NewClient(
+		adminPassword,
+		livebox.WithAddress(liveboxAddress),
+		livebox.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		log.Fatalf("Failed to create Livebox client: %v", err)
+	}
+
 	var (
 		ctx      = context.Background()
 		registry = prometheus.NewRegistry()
-		client   = livebox.NewClient(adminPassword)
 		pollers  = poller.Pollers{
 			poller.NewDevicesTotal(client),
 			poller.NewInterfaceMbits(client),
@@ -136,7 +205,7 @@ func main() {
 	go func() {
 		for {
 			if err := pollers.Poll(ctx); err != nil {
-				if errors.Is(err, livebox.ErrInvalidPassword) {
+				if isFatalError(err) {
 					log.Fatal(err)
 				}
 
