@@ -134,6 +134,19 @@ func getHTTPClient() (*http.Client, error) {
 	}, nil
 }
 
+func isFatalError(err error) bool {
+	if errors.Is(err, livebox.ErrInvalidPassword) {
+		return true
+	}
+
+	var certError *tls.CertificateVerificationError
+	if errors.As(err, &certError) {
+		return true
+	}
+
+	return false
+}
+
 func main() {
 	pollingFrequency := flag.Uint("polling-frequency", defaultPollingFrequency, "Polling frequency")
 	listen := flag.String("listen", ":8080", "Listening address")
@@ -192,7 +205,7 @@ func main() {
 	go func() {
 		for {
 			if err := pollers.Poll(ctx); err != nil {
-				if errors.Is(err, livebox.ErrInvalidPassword) {
+				if isFatalError(err) {
 					log.Fatal(err)
 				}
 
