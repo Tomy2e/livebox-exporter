@@ -7,7 +7,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -116,7 +115,7 @@ func getHTTPClient() (*http.Client, error) {
 		rootCAs = x509.NewCertPool()
 	}
 
-	certs, err := ioutil.ReadFile(liveboxCACertPath)
+	certs, err := os.ReadFile(liveboxCACertPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read livebox CA cert: %w", err)
 	}
@@ -135,16 +134,12 @@ func getHTTPClient() (*http.Client, error) {
 }
 
 func isFatalError(err error) bool {
-	if errors.Is(err, livebox.ErrInvalidPassword) {
+	if errors.Is(err, livebox.ErrInvalidCredentials) {
 		return true
 	}
 
 	var certError *tls.CertificateVerificationError
-	if errors.As(err, &certError) {
-		return true
-	}
-
-	return false
+	return errors.As(err, &certError)
 }
 
 func main() {
@@ -184,7 +179,6 @@ func main() {
 		ctx      = context.Background()
 		registry = prometheus.NewRegistry()
 		pollers  = poller.Pollers{
-			poller.NewDevicesTotal(client),
 			poller.NewInterfaceMbits(client),
 		}
 	)
@@ -200,7 +194,20 @@ func main() {
 		)...,
 	)
 
-	registry.MustRegister(collector.NewDeviceInfo(client))
+	writeHeaderVec := prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "promhttp_metric_handler_write_header_duration_seconds",
+			Help:    "A histogram of time to first write latencies.",
+			Buckets: prometheus.DefBuckets,
+		},
+		[]string{"code"},
+	)
+
+	registry.MustRegister(
+		collector.NewDeviceInfo(client),
+		collector.NewDevices(client),
+		writeHeaderVec,
+	)
 
 	go func() {
 		for {
@@ -216,9 +223,11 @@ func main() {
 		}
 	}()
 
-	http.Handle("/metrics", promhttp.InstrumentMetricHandler(
-		registry, promhttp.HandlerFor(registry, promhttp.HandlerOpts{}),
-	))
+	http.Handle("/metrics", promhttp.InstrumentHandlerTimeToWriteHeader(writeHeaderVec,
+		promhttp.InstrumentMetricHandler(
+			registry, promhttp.HandlerFor(registry, promhttp.HandlerOpts{}),
+		)),
+	)
 	log.Printf("Listening on %s\n", *listen)
 	log.Fatal(http.ListenAndServe(*listen, nil))
 }
