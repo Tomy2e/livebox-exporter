@@ -20,6 +20,8 @@ livebox:
   # CA cert of the Livebox.
   caCert: ""
 
+extraArgs: []
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
