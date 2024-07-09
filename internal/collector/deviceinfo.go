@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/Tomy2e/livebox-api-client"
 	"github.com/Tomy2e/livebox-api-client/api/request"
@@ -49,14 +50,14 @@ func NewDeviceInfo(client *livebox.Client) *DeviceInfo {
 // Describe currently does nothing.
 func (d *DeviceInfo) Describe(_ chan<- *prometheus.Desc) {}
 
-func (d *DeviceInfo) deviceInfo(ctx context.Context, c chan<- prometheus.Metric) {
+func (d *DeviceInfo) deviceInfo(c chan<- prometheus.Metric) {
 	var deviceInfo struct {
 		Status struct {
 			NumberOfReboots float64 `json:"NumberOfReboots"`
 			UpTime          float64 `json:"UpTime"`
 		} `json:"status"`
 	}
-	if err := d.client.Request(ctx, request.New("DeviceInfo", "get", nil), &deviceInfo); err != nil {
+	if err := d.client.Request(context.TODO(), request.New("DeviceInfo", "get", nil), &deviceInfo); err != nil {
 		log.Printf("WARN: DeviceInfo collector failed: %s", err)
 		return
 	}
@@ -65,14 +66,14 @@ func (d *DeviceInfo) deviceInfo(ctx context.Context, c chan<- prometheus.Metric)
 	c <- prometheus.MustNewConstMetric(d.uptimeMetric, prometheus.GaugeValue, deviceInfo.Status.UpTime)
 }
 
-func (d *DeviceInfo) memoryStatus(ctx context.Context, c chan<- prometheus.Metric) {
+func (d *DeviceInfo) memoryStatus(c chan<- prometheus.Metric) {
 	var memoryStatus struct {
 		Status struct {
 			Total float64 `json:"Total"`
 			Free  float64 `json:"Free"`
 		} `json:"status"`
 	}
-	if err := d.client.Request(ctx, request.New("DeviceInfo.MemoryStatus", "get", nil), &memoryStatus); err != nil {
+	if err := d.client.Request(context.TODO(), request.New("DeviceInfo.MemoryStatus", "get", nil), &memoryStatus); err != nil {
 		log.Printf("WARN: MemoryStatus collector failed: %s", err)
 		return
 	}
@@ -83,19 +84,18 @@ func (d *DeviceInfo) memoryStatus(ctx context.Context, c chan<- prometheus.Metri
 
 // Collect collects all DeviceInfo metrics.
 func (d *DeviceInfo) Collect(c chan<- prometheus.Metric) {
-	ctx, cancel := context.WithTimeout(context.TODO(), collectTimeout)
-	defer cancel()
+	defer warnOnSlowCollect(d, time.Now())
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		d.deviceInfo(ctx, c)
+		d.deviceInfo(c)
 		wg.Done()
 	}()
 
 	wg.Add(1)
 	go func() {
-		d.memoryStatus(ctx, c)
+		d.memoryStatus(c)
 		wg.Done()
 	}()
 	wg.Wait()

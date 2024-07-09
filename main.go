@@ -38,8 +38,8 @@ var experimentalMetrics = []string{
 }
 
 func parseExperimentalFlag(
-	ctx context.Context,
 	client *livebox.Client,
+	interfaces []*exporterLivebox.Interface,
 	experimental string,
 	pollingFrequency *uint,
 ) (pollers []poller.Poller) {
@@ -47,12 +47,7 @@ func parseExperimentalFlag(
 		return nil
 	}
 
-	var (
-		interfaces []*exporterLivebox.Interface
-		err        error
-
-		enabled = make(map[string]bool)
-	)
+	enabled := make(map[string]bool)
 
 	for _, exp := range strings.Split(experimental, ",") {
 		exp = strings.TrimSpace(exp)
@@ -64,17 +59,6 @@ func parseExperimentalFlag(
 
 		if enabled[exp] {
 			continue
-		}
-
-		// Discover interfaces for experimental pollers that require interfaces.
-		switch exp {
-		case ExperimentalMetricsInterfaceHomeLan, ExperimentalMetricsInterfaceNetDev:
-			if interfaces == nil {
-				interfaces, err = exporterLivebox.DiscoverInterfaces(ctx, client)
-				if err != nil {
-					log.Fatalf("Failed to discover Livebox interfaces: %s\n", err)
-				}
-			}
 		}
 
 		switch exp {
@@ -161,6 +145,10 @@ func main() {
 		liveboxAddress = livebox.DefaultAddress
 	}
 
+	if *pollingFrequency == 0 || *pollingFrequency > 300 {
+		log.Fatal("polling-frequency must be between 1 and 300 seconds")
+	}
+
 	httpClient, err := getHTTPClient()
 	if err != nil {
 		log.Fatal(err)
@@ -183,8 +171,13 @@ func main() {
 		}
 	)
 
+	interfaces, err := exporterLivebox.DiscoverInterfaces(ctx, client)
+	if err != nil {
+		log.Fatalf("Failed to discover Livebox interfaces: %s\n", err)
+	}
+
 	// Add experimental pollers.
-	pollers = append(pollers, parseExperimentalFlag(ctx, client, *experimental, pollingFrequency)...)
+	pollers = append(pollers, parseExperimentalFlag(client, interfaces, *experimental, pollingFrequency)...)
 
 	registry.MustRegister(
 		append(
@@ -205,7 +198,7 @@ func main() {
 
 	registry.MustRegister(
 		collector.NewDeviceInfo(client),
-		collector.NewDevices(client),
+		collector.NewDevices(client, interfaces),
 		writeHeaderVec,
 	)
 
