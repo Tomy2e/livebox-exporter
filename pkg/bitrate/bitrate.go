@@ -58,7 +58,7 @@ func (b *Bitrate) ShouldMeasure(name string) bool {
 		return true
 	}
 
-	return time.Now().Sub(last.Last) > b.minDelayBetweenMeasures
+	return time.Since(last.Last) > b.minDelayBetweenMeasures
 }
 
 // Measure saves the current measure and returns the current RX/TX bitrates.
@@ -69,11 +69,10 @@ func (b *Bitrate) Measure(name string, current *Counters) *Bitrates {
 
 	// Only calculate bitrates if there is a previous measure.
 	if ok && !last.Last.IsZero() {
-		elapsed := time.Now().Sub(last.Last)
+		elapsed := time.Since(last.Last)
 
-		if elapsed.Seconds() > 0 {
-			diff := current.Rx - last.Rx
-			if diff >= 0 {
+		if elapsed.Seconds() > 0 && elapsed.Minutes() <= 6 {
+			if diff := int64(current.Rx - last.Rx); diff >= 0 {
 				br.Rx = &BitrateSpec{
 					Value: BytesPerSecToMbits(float64(diff) / elapsed.Seconds()),
 				}
@@ -83,8 +82,7 @@ func (b *Bitrate) Measure(name string, current *Counters) *Bitrates {
 				}
 			}
 
-			diff = current.Tx - last.Tx
-			if diff >= 0 {
+			if diff := int64(current.Tx - last.Tx); diff >= 0 {
 				br.Tx = &BitrateSpec{
 					Value: BytesPerSecToMbits(float64(diff) / elapsed.Seconds()),
 				}
@@ -93,6 +91,15 @@ func (b *Bitrate) Measure(name string, current *Counters) *Bitrates {
 					Reset: true,
 				}
 			}
+		}
+
+		// Sanitize bitrates: we assume bitrates cannot be above 10000 Mbit/s.
+		if br.Rx != nil && br.Rx.Value > 10000 {
+			br.Rx = nil
+		}
+
+		if br.Tx != nil && br.Tx.Value > 10000 {
+			br.Tx = nil
 		}
 	}
 

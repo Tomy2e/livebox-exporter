@@ -4,13 +4,12 @@ import (
 	"context"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/Tomy2e/livebox-api-client"
 	"github.com/Tomy2e/livebox-api-client/api/request"
 	"github.com/prometheus/client_golang/prometheus"
 )
-
-var _ prometheus.Collector = &DeviceInfo{}
 
 // DeviceInfo implements a prometheus Collector that returns Livebox specific metrics.
 type DeviceInfo struct {
@@ -49,7 +48,7 @@ func NewDeviceInfo(client *livebox.Client) *DeviceInfo {
 }
 
 // Describe currently does nothing.
-func (d *DeviceInfo) Describe(c chan<- *prometheus.Desc) {}
+func (d *DeviceInfo) Describe(_ chan<- *prometheus.Desc) {}
 
 func (d *DeviceInfo) deviceInfo(c chan<- prometheus.Metric) {
 	var deviceInfo struct {
@@ -85,6 +84,8 @@ func (d *DeviceInfo) memoryStatus(c chan<- prometheus.Metric) {
 
 // Collect collects all DeviceInfo metrics.
 func (d *DeviceInfo) Collect(c chan<- prometheus.Metric) {
+	defer warnOnSlowCollect(d, time.Now())
+
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {

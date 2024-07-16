@@ -7,21 +7,23 @@ FTTH subscription.
 
 This exporter currently exposes the following metrics:
 
-| Name                                    | Type  | Description                                       | Labels    | Experimental |
-| --------------------------------------- | ----- | ------------------------------------------------- | --------- | ------------ |
-| livebox_interface_rx_mbits              | gauge | Received Mbits per second                         | interface | No           |
-| livebox_interface_tx_mbits              | gauge | Transmitted Mbits per second                      | interface | No           |
-| livebox_devices_total                   | gauge | The total number of active devices                | type      | No           |
-| livebox_deviceinfo_reboots_total        | gauge | Number of Livebox reboots                         |           | No           |
-| livebox_deviceinfo_uptime_seconds_total | gauge | Livebox current uptime                            |           | No           |
-| livebox_deviceinfo_memory_total_bytes   | gauge | Livebox system total memory                       |           | No           |
-| livebox_deviceinfo_memory_usage_bytes   | gauge | Livebox system used memory                        |           | No           |
-| livebox_interface_homelan_rx_mbits      | gauge | Received Mbits per second                         | interface | Yes          |
-| livebox_interface_homelan_tx_mbits      | gauge | Transmitted Mbits per second                      | interface | Yes          |
-| livebox_interface_netdev_rx_mbits       | gauge | Received Mbits per second                         | interface | Yes          |
-| livebox_interface_netdev_tx_mbits       | gauge | Transmitted Mbits per second                      | interface | Yes          |
-| livebox_wan_rx_mbits                    | gauge | Received Mbits per second on the WAN interface    |           | Yes          |
-| livebox_wan_tx_mbits                    | gauge | Transmitted Mbits per second on the WAN interface |           | Yes          |
+| Name                                    | Type  | Description                                       | Labels                  | Experimental |
+| --------------------------------------- | ----- | ------------------------------------------------- | ----------------------- | ------------ |
+| livebox_interface_rx_mbits              | gauge | Received Mbits per second                         | interface               | No           |
+| livebox_interface_tx_mbits              | gauge | Transmitted Mbits per second                      | interface               | No           |
+| livebox_device_active                   | gauge | Status of the device                              | name, type, mac         | No           |
+| livebox_device_rx_mbits                 | gauge | Received Mbits per second by device               | name, type, mac, source | No           |
+| livebox_device_tx_mbits                 | gauge | Transmitted Mbits per second by device            | name, type, mac, source | No           |
+| livebox_deviceinfo_reboots_total        | gauge | Number of Livebox reboots                         |                         | No           |
+| livebox_deviceinfo_uptime_seconds_total | gauge | Livebox current uptime                            |                         | No           |
+| livebox_deviceinfo_memory_total_bytes   | gauge | Livebox system total memory                       |                         | No           |
+| livebox_deviceinfo_memory_usage_bytes   | gauge | Livebox system used memory                        |                         | No           |
+| livebox_interface_homelan_rx_mbits      | gauge | Received Mbits per second                         | interface               | Yes          |
+| livebox_interface_homelan_tx_mbits      | gauge | Transmitted Mbits per second                      | interface               | Yes          |
+| livebox_interface_netdev_rx_mbits       | gauge | Received Mbits per second                         | interface               | Yes          |
+| livebox_interface_netdev_tx_mbits       | gauge | Transmitted Mbits per second                      | interface               | Yes          |
+| livebox_wan_rx_mbits                    | gauge | Received Mbits per second on the WAN interface    |                         | Yes          |
+| livebox_wan_tx_mbits                    | gauge | Transmitted Mbits per second on the WAN interface |                         | Yes          |
 
 Experimental metrics are not enabled by default, use the `-experimental`
 command-line option to enable them.
