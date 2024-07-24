@@ -28,6 +28,22 @@ This exporter currently exposes the following metrics:
 Experimental metrics are not enabled by default, use the `-experimental`
 command-line option to enable them.
 
+## Grafana
+
+You can find an example of Grafana dashboard here: <https://grafana.com/grafana/dashboards/21577-livebox/>
+
+## Prometheus configuration
+
+The exporter can sometimes answer slowly (due to livebox API being slow),
+I highly recommend setting a `scrape_timeout` of at least 15s:
+
+```yaml
+- job_name: livebox-exporter
+  scrape_timeout: 15s
+  static_configs:
+    - targets: ["localhost:8080"]
+```
+
 ## Usage
 
 ### Options
@@ -55,4 +71,17 @@ Use the following commands to run the exporter in Docker:
 ```console
 docker build -t livebox-exporter .
 docker run -p 8080:8080 -e ADMIN_PASSWORD=<changeme> livebox-exporter
+```
+
+An already built Docker image is also available at: `ghcr.io/tomy2e/livebox-exporter:latest`.
+
+### Helm
+
+You can install the livebox-exporter in your Kubernetes cluster using Helm:
+
+```console
+helm upgrade livebox-exporter oci://ghcr.io/tomy2e/livebox-exporter/charts/livebox-exporter \
+    --install \
+    --version 0.4.0 \
+    --set livebox.adminPassword.value=YOUR_LIVEBOX_ADMIN_PASSWORD
 ```
