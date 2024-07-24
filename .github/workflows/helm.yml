@@ -1,0 +1,30 @@
+name: Helm
+
+on:
+  push:
+    tags: [ 'chart/*' ]
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Extract metadata
+        id: metadata
+        run: |
+            echo "SOURCE_TAG=${GITHUB_REF#refs/tags/chart/}" >> $GITHUB_OUTPUT
+            echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+      - name: Push chart
+        uses: appany/helm-oci-chart-releaser@v0.3.0
+        with:
+          name: livebox-exporter
+          repository: ${{ steps.metadata.outputs.REPO }}/charts
+          tag: ${{ steps.metadata.outputs.SOURCE_TAG }}
+          path: charts/livebox-exporter
+          registry: ghcr.io
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.GITHUB_TOKEN }}
