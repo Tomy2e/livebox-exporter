@@ -28,6 +28,30 @@ This exporter currently exposes the following metrics:
 Experimental metrics are not enabled by default, use the `-experimental`
 command-line option to enable them.
 
+### Limitations
+
+This section describes some known issues and how to solve them.
+
+#### `livebox_interface_*` capped to 1 Gb/s for WAN interfaces
+
+You should use one of the following experimental metrics if you want to monitor WAN interfaces:
+
+- `livebox_interface_homelan_*`
+- `livebox_interface_netdev_*`
+- `livebox_wan_*`
+
+#### Some metrics are no longer accurate after a few days of Livebox uptime
+
+The following metrics are no longer accurate after a few days of Livebox uptime:
+
+- `livebox_interface`: only for `WAN_*` interfaces
+- `livebox_device_*_mbits`: only for metrics with `source=events` label
+- `livebox_interface_homelan_*`: only for WAN interfaces
+- `livebox_interface_netdev_*`: only for WAN interfaces
+- `livebox_wan_`
+
+If you really want to monitor these metrics, you need to setup a CronJob to reboot your Livebox on a regular basis.
+
 ## Grafana
 
 You can find an example of Grafana dashboard here: <https://grafana.com/grafana/dashboards/21577-livebox/>
