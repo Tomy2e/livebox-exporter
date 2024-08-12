@@ -53,27 +53,59 @@ func (im *InterfaceNetDevMbits) Collectors() []prometheus.Collector {
 	}
 }
 
+func (im *InterfaceNetDevMbits) getNetDevStats(ctx context.Context, interfaceName string) (uint64, uint64, error) {
+	var stats struct {
+		Status struct {
+			RxBytes uint64
+			TxBytes uint64
+		} `json:"status"`
+	}
+
+	if err := im.client.Request(ctx, request.New(
+		fmt.Sprintf("NeMo.Intf.%s", interfaceName),
+		"getNetDevStats",
+		nil,
+	), &stats); err != nil {
+		return 0, 0, err
+	}
+
+	return stats.Status.RxBytes, stats.Status.TxBytes, nil
+}
+
+func (im *InterfaceNetDevMbits) getSSIDStats(ctx context.Context, interfaceName string) (uint64, uint64, error) {
+	var stats struct {
+		Status struct {
+			BytesReceived uint64
+			BytesSent     uint64
+		} `json:"status"`
+	}
+
+	if err := im.client.Request(ctx, request.New(
+		fmt.Sprintf("NeMo.Intf.%s", interfaceName),
+		"getSSIDStats",
+		nil,
+	), &stats); err != nil {
+		return 0, 0, err
+	}
+
+	return stats.Status.BytesReceived, stats.Status.BytesSent, nil
+}
+
 // Poll polls the current bandwidth usage.
 func (im *InterfaceNetDevMbits) Poll(ctx context.Context) error {
 	for _, itf := range im.interfaces {
-		var stats struct {
-			Status struct {
-				RxBytes uint64 `json:"RxBytes"`
-				TxBytes uint64 `json:"TxBytes"`
-			} `json:"status"`
-		}
+		var (
+			counters = &bitrate.Counters{}
+			err      error
+		)
 
-		if err := im.client.Request(ctx, request.New(
-			fmt.Sprintf("NeMo.Intf.%s", itf.Name),
-			"getNetDevStats",
-			nil,
-		), &stats); err != nil {
-			return fmt.Errorf("failed to get stats for interface: %s: %w", itf.Name, err)
+		if itf.IsWLAN() {
+			counters.Rx, counters.Tx, err = im.getSSIDStats(ctx, itf.Name)
+		} else {
+			counters.Rx, counters.Tx, err = im.getNetDevStats(ctx, itf.Name)
 		}
-
-		counters := &bitrate.Counters{
-			Tx: stats.Status.TxBytes,
-			Rx: stats.Status.RxBytes,
+		if err != nil {
+			return fmt.Errorf("failed to get stats for interface (WLAN=%t): %s: %w", itf.IsWLAN(), itf.Name, err)
 		}
 
 		if !itf.IsWAN() {
