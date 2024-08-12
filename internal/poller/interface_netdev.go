@@ -68,7 +68,7 @@ func (im *InterfaceNetDevMbits) Poll(ctx context.Context) error {
 			"getNetDevStats",
 			nil,
 		), &stats); err != nil {
-			return err
+			return fmt.Errorf("failed to get stats for interface: %s: %w", itf.Name, err)
 		}
 
 		counters := &bitrate.Counters{

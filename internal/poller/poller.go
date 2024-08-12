@@ -2,7 +2,9 @@ package poller
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/Tomy2e/livebox-exporter/pkg/reflect"
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/errgroup"
 )
@@ -33,7 +35,11 @@ func (p Pollers) Poll(ctx context.Context) error {
 	for _, poller := range p {
 		poller := poller
 		eg.Go(func() error {
-			return poller.Poll(ctx)
+			if err := poller.Poll(ctx); err != nil {
+				return fmt.Errorf("%s: %w", reflect.GetType(poller), err)
+			}
+
+			return nil
 		})
 	}
 
