@@ -199,6 +199,7 @@ func main() {
 	registry.MustRegister(
 		collector.NewDeviceInfo(client),
 		collector.NewDevices(client, interfaces),
+		collector.NewONT(client, interfaces),
 		writeHeaderVec,
 	)
 
