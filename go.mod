@@ -1,6 +1,6 @@
 module github.com/Tomy2e/livebox-exporter
 
-go 1.18
+go 1.20
 
 require (
 	github.com/Tomy2e/livebox-api-client v0.0.0-20230524112450-31caca47cbd8
