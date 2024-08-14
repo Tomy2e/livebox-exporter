@@ -40,7 +40,8 @@ func DiscoverInterfaces(ctx context.Context, client *livebox.Client) ([]*Interfa
 		ctx,
 		request.New("NeMo.Intf.data", "getMIBs", map[string]interface{}{
 			"traverse": "all",
-			"flag":     "statmon && !vlan",
+			// Only discover enabled interfaces: https://github.com/Tomy2e/livebox-exporter/issues/15
+			"flag": "statmon && !vlan && enabled",
 		}),
 		&mibs,
 	); err != nil {
