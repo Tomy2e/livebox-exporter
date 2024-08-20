@@ -53,8 +53,7 @@ func (d *DeviceInfo) Describe(_ chan<- *prometheus.Desc) {}
 func (d *DeviceInfo) deviceInfo(c chan<- prometheus.Metric) {
 	var deviceInfo struct {
 		Status struct {
-			NumberOfReboots float64 `json:"NumberOfReboots"`
-			UpTime          float64 `json:"UpTime"`
+			UpTime float64 `json:"UpTime"`
 		} `json:"status"`
 	}
 	if err := d.client.Request(context.TODO(), request.New("DeviceInfo", "get", nil), &deviceInfo); err != nil {
@@ -62,8 +61,21 @@ func (d *DeviceInfo) deviceInfo(c chan<- prometheus.Metric) {
 		return
 	}
 
-	c <- prometheus.MustNewConstMetric(d.numberOfRebootsMetric, prometheus.GaugeValue, deviceInfo.Status.NumberOfReboots)
 	c <- prometheus.MustNewConstMetric(d.uptimeMetric, prometheus.GaugeValue, deviceInfo.Status.UpTime)
+}
+
+func (d *DeviceInfo) numberOfReboots(c chan<- prometheus.Metric) {
+	var deviceInfo struct {
+		Status struct {
+			BootCounter float64 `json:"BootCounter"`
+		} `json:"status"`
+	}
+	if err := d.client.Request(context.TODO(), request.New("NMC.Reboot", "get", nil), &deviceInfo); err != nil {
+		log.Printf("WARN: NumberOfReboots collector failed: %s", err)
+		return
+	}
+
+	c <- prometheus.MustNewConstMetric(d.numberOfRebootsMetric, prometheus.GaugeValue, deviceInfo.Status.BootCounter)
 }
 
 func (d *DeviceInfo) memoryStatus(c chan<- prometheus.Metric) {
@@ -98,5 +110,12 @@ func (d *DeviceInfo) Collect(c chan<- prometheus.Metric) {
 		d.memoryStatus(c)
 		wg.Done()
 	}()
+
+	wg.Add(1)
+	go func() {
+		d.numberOfReboots(c)
+		wg.Done()
+	}()
+
 	wg.Wait()
 }
