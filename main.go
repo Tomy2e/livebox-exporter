@@ -23,6 +23,20 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const indexPage = `<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Livebox exporter</title>
+	</head>
+
+	<body>
+		<h1>The livebox-exporter is working!</h1>
+
+		<p>See <a href="/metrics">/metrics</a> for metrics.</p>
+	</body>
+</html>
+`
+
 const defaultPollingFrequency = 30
 
 const (
@@ -222,6 +236,10 @@ func main() {
 			registry, promhttp.HandlerFor(registry, promhttp.HandlerOpts{}),
 		)),
 	)
+	http.HandleFunc("/{$}", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(indexPage))
+	})
+
 	log.Printf("Listening on %s\n", *listen)
 	log.Fatal(http.ListenAndServe(*listen, nil))
 }
