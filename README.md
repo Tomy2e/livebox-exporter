@@ -109,6 +109,6 @@ You can install the livebox-exporter in your Kubernetes cluster using Helm:
 ```console
 helm upgrade livebox-exporter oci://ghcr.io/tomy2e/livebox-exporter/charts/livebox-exporter \
     --install \
-    --version 0.4.0 \
+    --version 0.6.0 \
     --set livebox.adminPassword.value=YOUR_LIVEBOX_ADMIN_PASSWORD
 ```
