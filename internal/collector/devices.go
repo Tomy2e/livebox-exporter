@@ -12,7 +12,7 @@ import (
 	"github.com/Tomy2e/livebox-api-client/api/request"
 	"github.com/Tomy2e/livebox-exporter/pkg/bitrate"
 	exporterLivebox "github.com/Tomy2e/livebox-exporter/pkg/livebox"
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
