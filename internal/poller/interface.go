@@ -63,7 +63,7 @@ func (im *InterfaceMbits) Poll(ctx context.Context) error {
 		request.New(
 			"HomeLan",
 			"getResults",
-			map[string]interface{}{
+			map[string]any{
 				"Seconds":          0,
 				"NumberOfReadings": 1,
 			},
